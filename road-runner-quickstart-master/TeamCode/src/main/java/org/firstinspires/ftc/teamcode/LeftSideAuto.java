@@ -107,11 +107,11 @@ public class LeftSideAuto extends LinearOpMode {
 
                 // Once arm reached target, move slides
                 if (armReachedTarget(1650, 200)) {
-                    moveSlides(2130, 1);
+                    moveSlides(2160, 1);
                 }
 
                 // Once slide reached target, move wrist
-                if (slidesReachedTarget(2130, 20) && !wristPlaceSample) {
+                if (slidesReachedTarget(2160, 20) && !wristPlaceSample) {
                     timer.reset();
                     wrist.PlaceSample();
                     wristPlaceSample = true;
@@ -150,9 +150,9 @@ public class LeftSideAuto extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                moveSlides(1125, 1);
+                moveSlides(1260, 1);
 
-                if (slidesReachedTarget(1125, 10) && !closeClaw) {
+                if (slidesReachedTarget(1260, 10) && !closeClaw) {
                     timer.reset();
                     claw.setPosition(0.5);
                     closeClaw = true;
@@ -179,9 +179,9 @@ public class LeftSideAuto extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                moveSlides(1250, 1);
+                moveSlides(1200, 1);
 
-                if (slidesReachedTarget(1250, 10) && !closeClaw) {
+                if (slidesReachedTarget(1200, 10) && !closeClaw) {
                     timer.reset();
                     claw.setPosition(0.5);
                     closeClaw = true;
@@ -208,10 +208,10 @@ public class LeftSideAuto extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                moveSlides(1080, 1);
+                moveSlides(1260, 1);
                 wrist.PickUp45Right();
 
-                if (slidesReachedTarget(1080, 10) && !closeClaw) {
+                if (slidesReachedTarget(1260, 10) && !closeClaw) {
                     closeClaw = true;
                     claw.setPosition(0.5);
                     timer.reset();
@@ -338,7 +338,7 @@ public class LeftSideAuto extends LinearOpMode {
 
         TrajectoryActionBuilder placeSample1 = drive.actionBuilder(new Pose2d(-37, -62, Math.toRadians(0)))
                 .setTangent(Math.toRadians(100))
-                .splineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)), Math.toRadians(180));
+                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(45)), Math.toRadians(180));
 
         TrajectoryActionBuilder grabSample2 = placeSample1.endTrajectory().fresh()
                 .setTangent(Math.toRadians(43))
@@ -346,23 +346,23 @@ public class LeftSideAuto extends LinearOpMode {
 
         TrajectoryActionBuilder placeSample2 = grabSample2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(223))
-                .lineToYLinearHeading(-54, Math.toRadians(45));
+                .lineToYLinearHeading(-55, Math.toRadians(45));
 
         TrajectoryActionBuilder grabSample3 = placeSample2.endTrajectory().fresh()
-                .setTangent(Math.toRadians(128))
+                .setTangent(Math.toRadians(122))
                 .lineToYLinearHeading(-48, Math.toRadians(90));
 
         TrajectoryActionBuilder placeSample3 = grabSample3.endTrajectory().fresh()
-                .setTangent(Math.toRadians(308))
-                .lineToYLinearHeading(-54, Math.toRadians(45));
+                .setTangent(Math.toRadians(302))
+                .lineToYLinearHeading(-55, Math.toRadians(45));
 
         TrajectoryActionBuilder grabSample4 = placeSample3.endTrajectory().fresh()
-                .setTangent(Math.toRadians(106))
+                .setTangent(Math.toRadians(98))
                 .lineToYLinearHeading(-46, Math.toRadians(120));
 
         TrajectoryActionBuilder placeSample4 = grabSample4.endTrajectory().fresh()
-                .setTangent(Math.toRadians(286))
-                .lineToYLinearHeading(-54, Math.toRadians(45));
+                .setTangent(Math.toRadians(278))
+                .lineToYLinearHeading(-55, Math.toRadians(45));
 
         TrajectoryActionBuilder grabSample5 = placeSample4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
@@ -370,7 +370,7 @@ public class LeftSideAuto extends LinearOpMode {
 
         TrajectoryActionBuilder placeSample5 = grabSample5.endTrajectory().fresh()
                 .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)), Math.toRadians(270));
+                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(45)), Math.toRadians(270));
 
         TrajectoryActionBuilder grabSample6 = placeSample5.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
@@ -378,7 +378,7 @@ public class LeftSideAuto extends LinearOpMode {
 
         TrajectoryActionBuilder placeSample6 = grabSample6.endTrajectory().fresh()
                 .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)), Math.toRadians(270));
+                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(45)), Math.toRadians(270));
 
         ArmSlidesClaw armslidesclaw = new ArmSlidesClaw(hardwareMap);
 
@@ -386,66 +386,65 @@ public class LeftSideAuto extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-//        Actions.runBlocking(
-//                new SequentialAction(
-//                        new ParallelAction(
-//                                placeSample1.build(),
-//                                armslidesclaw.placeSample()
-//                        ),
-//                        new ParallelAction(
-//                                grabSample2.build(),
-//                                new SequentialAction(
-//                                        armslidesclaw.resetSlides(),
-//                                        armslidesclaw.resetArm()
-//                                )
-//                        ),
-//                        armslidesclaw.grabSample2(),
-//                        new ParallelAction(
-//                                placeSample2.build(),
-//                                new SequentialAction(
-//                                        armslidesclaw.resetSlides(),
-//                                        armslidesclaw.placeSample()
-//                                )
-//                        ),
-//                        new ParallelAction(
-//                                grabSample3.build(),
-//                                new SequentialAction(
-//                                        armslidesclaw.resetSlides(),
-//                                        armslidesclaw.resetArm()
-//                                )
-//                        ),
-//                        armslidesclaw.grabSample3(),
-//                        new ParallelAction(
-//                                placeSample3.build(),
-//                                new SequentialAction(
-//                                        armslidesclaw.resetSlides(),
-//                                        armslidesclaw.placeSample()
-//                                )
-//                        ),
-//                        new ParallelAction(
-//                                grabSample4.build(),
-//                                new SequentialAction(
-//                                        armslidesclaw.resetSlides(),
-//                                        armslidesclaw.resetArm()
-//                                )
-//                        ),
-//                        armslidesclaw.grabSample4(),
-//                        new ParallelAction(
-//                                placeSample4.build(),
-//                                new SequentialAction(
-//                                        armslidesclaw.resetSlides(),
-//                                        armslidesclaw.placeSample()
-//                                )
-//                        ),
-//                        armslidesclaw.grabSample4()
-////                        placeSample4.build(),
-////                        grabSample5.build(),
-////                        placeSample5.build(),
-////                        grabSample6.build(),
-////                        placeSample6.build()
-//                )
-//        );
+        Actions.runBlocking(
+                new SequentialAction(
+                        new ParallelAction(
+                                placeSample1.build(),
+                                armslidesclaw.placeSample()
+                        ),
+                        new ParallelAction(
+                                grabSample2.build(),
+                                new SequentialAction(
+                                        armslidesclaw.resetSlides(),
+                                        armslidesclaw.resetArm()
+                                )
+                        ),
+                        armslidesclaw.grabSample2(),
+                        new ParallelAction(
+                                placeSample2.build(),
+                                new SequentialAction(
+                                        armslidesclaw.resetSlides(),
+                                        armslidesclaw.placeSample()
+                                )
+                        ),
+                        new ParallelAction(
+                                grabSample3.build(),
+                                new SequentialAction(
+                                        armslidesclaw.resetSlides(),
+                                        armslidesclaw.resetArm()
+                                )
+                        ),
+                        armslidesclaw.grabSample3(),
+                        new ParallelAction(
+                                placeSample3.build(),
+                                new SequentialAction(
+                                        armslidesclaw.resetSlides(),
+                                        armslidesclaw.placeSample()
+                                )
+                        ),
+                        new ParallelAction(
+                                grabSample4.build(),
+                                new SequentialAction(
+                                        armslidesclaw.resetSlides(),
+                                        armslidesclaw.resetArm()
+                                )
+                        ),
+                        armslidesclaw.grabSample4(),
+                        new ParallelAction(
+                                placeSample4.build(),
+                                new SequentialAction(
+                                        armslidesclaw.resetSlides(),
+                                        armslidesclaw.placeSample()
+                                )
+                        ),
+                        grabSample5.build(),
+                        placeSample5.build(),
+                        grabSample6.build(),
+                        placeSample6.build()
+                )
+        );
 
+        /*
         Actions.runBlocking(
                 new SequentialAction(
                         placeSample1.build(),
@@ -461,5 +460,6 @@ public class LeftSideAuto extends LinearOpMode {
                         placeSample6.build()
                 )
         );
+        */
     }
 }

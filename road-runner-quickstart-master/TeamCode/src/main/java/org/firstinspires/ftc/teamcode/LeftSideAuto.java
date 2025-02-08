@@ -93,22 +93,23 @@ public class LeftSideAuto extends LinearOpMode {
 
                 if (!wristSample) {
                     wrist.PlaceSample();
+                    claw.setPosition(0.5);
                 }
 
                 // Once arm reached target, move slides
                 if (armReachedTarget(1650, 800)) {
-                    moveSlides(2160, 1);
+                    moveSlides(2120, 1);
                     wristSample = true;
                 }
 
                 // Once slide reached target, move wrist
-                if (slidesReachedTarget(2160, 20) && !wristPlaceSample) {
+                if (slidesReachedTarget(2120, 20) && !wristPlaceSample) {
                     timer.reset();
                     wristPlaceSample = true;
                 }
 
                 // Once wrist is moving and timer has reached seconds, open claw
-                if (wristPlaceSample && timer.seconds() > 0.8 && !resetWrist) {
+                if (wristPlaceSample && timer.seconds() > 0.2 && !resetWrist) {
                     timer.reset();
                     claw.setPosition(0);
                     resetWrist = true;
@@ -198,7 +199,7 @@ public class LeftSideAuto extends LinearOpMode {
                 }
 
                 if (extendSlidesSample && closeClaw && timer.seconds() > 0.5) {
-                    moveSlides(500, 1);
+                    moveSlides(400, 1);
                     resetSlides = true;
                 }
 
@@ -237,7 +238,7 @@ public class LeftSideAuto extends LinearOpMode {
                 }
 
                 if (extendSlidesSample && closeClaw && timer.seconds() > 0.5) {
-                    moveSlides(500, 1);
+                    moveSlides(400, 1);
                     resetSlides = true;
                 }
 
@@ -269,7 +270,7 @@ public class LeftSideAuto extends LinearOpMode {
                     wrist.PickUp45Right();
                 }
 
-                if (slidesReachedTarget(1300, 15) && !closeClaw) {
+                if (slidesReachedTarget(1300, 25) && !closeClaw) {
                     timer.reset();
                     claw.setPosition(0.5);
                     closeClaw = true;
@@ -277,7 +278,7 @@ public class LeftSideAuto extends LinearOpMode {
                 }
 
                 if (extendSlidesSample && closeClaw && timer.seconds() > 0.5) {
-                    moveSlides(500, 1);
+                    moveSlides(400, 1);
                     wrist.PickUp0();
                     resetSlides = true;
                 }
@@ -358,7 +359,7 @@ public class LeftSideAuto extends LinearOpMode {
 
         TrajectoryActionBuilder placeSample1 = drive.actionBuilder(new Pose2d(-37, -62, Math.toRadians(0)))
                 .setTangent(Math.toRadians(100))
-                .splineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)), Math.toRadians(180));
+                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(45)), Math.toRadians(180));
 
         TrajectoryActionBuilder grabSample2 = placeSample1.endTrajectory().fresh()
                 .setTangent(Math.toRadians(43))
@@ -366,14 +367,14 @@ public class LeftSideAuto extends LinearOpMode {
 
         TrajectoryActionBuilder placeSample2 = grabSample2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(223))
-                .lineToYLinearHeading(-54, Math.toRadians(45));
+                .lineToYLinearHeading(-55, Math.toRadians(45));
 
         TrajectoryActionBuilder grabSample3 = placeSample2.endTrajectory().fresh()
-                .setTangent(Math.toRadians(122))
+                .setTangent(Math.toRadians(114))
                 .lineToYLinearHeading(-48, Math.toRadians(90));
 
         TrajectoryActionBuilder placeSample3 = grabSample3.endTrajectory().fresh()
-                .setTangent(Math.toRadians(302))
+                .setTangent(Math.toRadians(294))
                 .lineToYLinearHeading(-55, Math.toRadians(45));
 
         TrajectoryActionBuilder grabSample4 = placeSample3.endTrajectory().fresh()
@@ -382,7 +383,7 @@ public class LeftSideAuto extends LinearOpMode {
 
         TrajectoryActionBuilder placeSample4 = grabSample4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(278))
-                .lineToYLinearHeading(-54, Math.toRadians(45));
+                .lineToYLinearHeading(-55, Math.toRadians(45));
 
         TrajectoryActionBuilder grabSample5 = placeSample4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))

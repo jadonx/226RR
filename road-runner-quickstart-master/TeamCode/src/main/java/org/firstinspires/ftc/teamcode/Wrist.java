@@ -48,6 +48,30 @@ public class Wrist {
         rotateServo.setPosition(0.35);
     }
 
+    public void SearchPickUp0() {
+        rotateServo.setPosition(0.16);
+    }
+
+    public void SearchPickUp45Right() {
+        rotateServo.setPosition(0.33);
+    }
+
+    public void SearchPickUp45Left() {
+        rotateServo.setPosition(0.67);
+    }
+
+    public void SearchPickUp90() {
+        rotateServo.setPosition(0.5);
+    }
+
+    public void middleWrist(){
+        wristServo.setPosition(0.2);
+    }
+
+    public void moveWristDown(){
+        wristServo.setPosition(1);
+    }
+
     public void PickUp45Left() {
         wristServo.setPosition(1);
         rotateServo.setPosition(0.67);

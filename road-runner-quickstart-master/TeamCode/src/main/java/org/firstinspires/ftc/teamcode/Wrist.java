@@ -72,6 +72,10 @@ public class Wrist {
         wristServo.setPosition(1);
     }
 
+    public void setRotateServo(double pos) {
+        rotateServo.setPosition(pos);
+    }
+
     public void PickUp45Left() {
         wristServo.setPosition(1);
         rotateServo.setPosition(0.67);

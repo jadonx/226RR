@@ -2,11 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Canvas;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.teamcode.SampleDetector;
 import org.opencv.core.CvType;
 import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfPoint;
@@ -23,33 +19,15 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class Camera extends OpenCvPipeline {
+public class SampleDetector extends OpenCvPipeline {
 
     public double distance;
-    public double realArea;
     ArrayList<RotatedRect> filteredRects;
     double minDistanceThreshold = 1000;
 
-    OpMode opMode;
-
-    public Mat frame;
-    private Mat hsv;
-    private Mat gray;
-    private Mat inRange;
-    private Mat kernel;
-    private Mat kernel2;
-    private Mat hierarchy;
-    private Mat mask;
-
-//    double realerX;
-//    double realerY;
-//    double bigAngle;
-
-    boolean angle =false;
 
     public enum SampleColor {
         YELLOW(),
@@ -57,14 +35,13 @@ public class Camera extends OpenCvPipeline {
         RED();
     }
 
-
+    public Mat frame;
 
     public static Telemetry telemetry;
 
     public static Scalar lowerYellow = new Scalar(19.0, 150.0, 130.1); // hsv
     public static Scalar upperYellow = new Scalar(30.0, 255.0, 255.0); // hsv
-    //public static Scalar lowerBlue = new Scalar(90.0, 150.0, 100.0); // hsv
-    public static Scalar lowerBlue = new Scalar(50.0, 50.0, 80.0); // hsv
+    public static Scalar lowerBlue = new Scalar(90.0, 150.0, 100.0); // hsv
     public static Scalar upperBlue = new Scalar(120.0, 255.0, 255.0); // hsv
     public static Scalar lowerRedH = new Scalar(10.0, 0.0, 0.0); // hsv
     public static Scalar upperRedH = new Scalar(160.0, 255.0, 255.0); // hsv
@@ -75,67 +52,17 @@ public class Camera extends OpenCvPipeline {
     private double k_translation = 1d/640d;
 
     public static SampleColor colorType = SampleColor.BLUE;
-    //@Override
-    public void init(/*int width, int height, CameraCalibration calibration*/) {
+//    @Override
+//    public void init(int width, int height, CameraCalibration calibration) {
+//
+//    }
 
-        frame = new Mat();
-
-        hsv = new Mat();
-
-
-        gray = new Mat();
-
-        mask = new Mat();
-
-        inRange = new Mat();
-
-
-        kernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(25, 25));
-        kernel2 = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(10, 10));
-
-
-        List<MatOfPoint> unfilteredContours = new ArrayList<>();
-        hierarchy = new Mat();
-
-
-        ArrayList<RotatedRect> rotatedRects = new ArrayList<>();
-
-        List<MatOfPoint> filteredContours = new ArrayList<>();
-
-
-        ArrayList<ArrayList<Double[]>> overlapGroups = new ArrayList<>();
-
-        ArrayList<Point> real = new ArrayList<>();
-
-
-        MatOfPoint2f intersection = new MatOfPoint2f();
-
-
-        MatOfPoint2f matOfPoint2f = new MatOfPoint2f();
-
-
-        MatOfPoint points = new MatOfPoint();
-
-
-        List<MatOfPoint> listThing = new ArrayList<>();
-
-
-
-    }
-    /*
-
-        public SampleDetector(Telemetry telemetry){
-            this.telemetry = telemetry;
-    //        this.colorType = colorType;
-        }
-
-     */
-    public Camera(OpMode _opMode) {
-        opMode = _opMode;
-        telemetry = _opMode.telemetry;
+    public SampleDetector(Telemetry telemetry){
+        this.telemetry = telemetry;
+//        this.colorType = colorType;
     }
 
-    //@Override
+    @Override
     public Mat processFrame(Mat input) {
         frame = input.clone();
         Mat hsv = new Mat(); // convert to hsv
@@ -148,8 +75,8 @@ public class Camera extends OpenCvPipeline {
         MatOfDouble muMat = new MatOfDouble();
         MatOfDouble sigmaMat = new MatOfDouble();
         Core.meanStdDev(gray, muMat, sigmaMat);
-//        telemetry.addData("gray mu", muMat.get(0,0)[0]);
-//        telemetry.addData("gray sigma", sigmaMat.get(0,0)[0]);
+        telemetry.addData("gray mu", muMat.get(0,0)[0]);
+        telemetry.addData("gray sigma", sigmaMat.get(0,0)[0]);
 
         double mu = muMat.get(0,0)[0];
         double sigma = sigmaMat.get(0,0)[0];
@@ -192,26 +119,18 @@ public class Camera extends OpenCvPipeline {
 //        Imgproc.dilate(inRange, inRange, kernel2);
 
         // Find all contours
-//        Imgproc.erode(inRange, inRange, kernel);
-//        Imgproc.dilate(inRange, inRange, kernel2);
-
-        // Find all contours
         List<MatOfPoint> unfilteredContours = new ArrayList<>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(inRange, unfilteredContours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
         // Filter contours by size and get rotated rects
-        int minArea = 2000;
+        int minArea = 20000;
         ArrayList<RotatedRect> rotatedRects = new ArrayList<>();
         List<MatOfPoint> filteredContours = new ArrayList<>();
-        Iterator<MatOfPoint> iterator = unfilteredContours.iterator();
-        while (iterator.hasNext()) {
-            MatOfPoint contour = iterator.next();
+        for (MatOfPoint contour : unfilteredContours) {
             RotatedRect minAreaRect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
             double area = minAreaRect.size.area();
-            if (area <= minArea) {
-                iterator.remove(); // Safely remove the element
-            } else {
+            if (area > minArea) {
                 filteredContours.add(contour);
                 rotatedRects.add(minAreaRect);
             }
@@ -303,8 +222,8 @@ public class Camera extends OpenCvPipeline {
             double length = 200;
             double vecX = center.x+length*Math.cos(Math.toRadians(procAngle));
             double vecY = center.y-length*Math.sin(Math.toRadians(procAngle));
-//            telemetry.addData("vecX", vecX);
-//            telemetry.addData("vecY", vecY);
+            telemetry.addData("vecX", vecX);
+            telemetry.addData("vecY", vecY);
             if (vecX < 0) {
                 vecY = center.y - (1+vecX/(length*Math.cos(Math.toRadians(procAngle))))*length*Math.sin(Math.toRadians(procAngle));
                 vecX = 0;
@@ -365,12 +284,11 @@ public class Camera extends OpenCvPipeline {
 
         // telemetry
         if (!filteredRects.isEmpty()) {
-//            telemetry.addData("width ", filteredRects.get(0).size.width);
-//            telemetry.addData("height ", filteredRects.get(0).size.height);
+            telemetry.addData("width ", filteredRects.get(0).size.width);
+            telemetry.addData("height ", filteredRects.get(0).size.height);
             telemetry.addData("area ", filteredRects.get(0).size.area());
-
-//            telemetry.addData("angle ", filteredRects.get(0).angle);
-//            telemetry.addData("center ", filteredRects.get(0).center);
+            telemetry.addData("angle ", filteredRects.get(0).angle);
+            telemetry.addData("center ", filteredRects.get(0).center);
 //            telemetry.addData("center scaled", new Point((filteredRects.get(0).center.x - 320) / 640 * 3.0/8.0, -(filteredRects.get(0).center.y - 240) / 480));
 //            output.add(new Point((i.center.x - 320) / 640 * canvasHorizontal, -(i.center.y - 240) / 240 * canvasVertical));
             double procAngle = filteredRects.get(0).angle;
@@ -378,11 +296,11 @@ public class Camera extends OpenCvPipeline {
                 procAngle *= -1;
             else
                 procAngle = 90-procAngle;
-//            telemetry.addData("procAngle ", procAngle);
+            telemetry.addData("procAngle ", procAngle);
             sampleAngle = procAngle;
         }
-//        telemetry.addData("sampleAngle", sampleAngle);
-//        telemetry.addData("Distance", distance);
+        telemetry.addData("sampleAngle", sampleAngle);
+        telemetry.addData("Distance", distance);
 
 
 
@@ -487,32 +405,21 @@ public class Camera extends OpenCvPipeline {
         double minY = real.get(0).y;
         for (int i = 1; i < real.size(); i++) {
             if (real.get(i).y < minY) {
-                realArea = filteredRects.get(i).size.area();
                 minY = real.get(i).y;
                 minYIndex = i;
             }
         }
 
-        // Ensure minYIndex is within bounds
-        if (minYIndex >= 0 && minYIndex < filteredRects.size() && minYIndex < real.size()) {
-            // Draw a bright red contour around the chosen rectangle
-            RotatedRect chosenRect = filteredRects.get(minYIndex);
-            Point[] vertices = new Point[4];
-            chosenRect.points(vertices);
-            for (int j = 0; j < 4; j++) {
-                Imgproc.line(frame, vertices[j], vertices[(j + 1) % 4], new Scalar(255, 0, 0), 4); // Bright red contour
-            }
-
-            // Return the realX of the rectangle with the lowest realY
-            return real.get(minYIndex).x;
-        } else {
-            telemetry.addData("Error", "Invalid minYIndex: " + minYIndex);
-            return 0;
+        // Draw a bright red contour around the chosen rectangle
+        RotatedRect chosenRect = filteredRects.get(minYIndex);
+        Point[] vertices = new Point[4];
+        chosenRect.points(vertices);
+        for (int j = 0; j < 4; j++) {
+            Imgproc.line(frame, vertices[j], vertices[(j + 1) % 4], new Scalar(255, 0, 0), 4); // Bright red contour
         }
-    }
 
-    public double getRealArea() {
-        return realArea;
+        // Return the realX of the rectangle with the lowest realY
+        return real.get(minYIndex).x;
     }
 
     public double realY() {
@@ -568,17 +475,4 @@ public class Camera extends OpenCvPipeline {
     }
 
     public double getDistance(){  return distance; }
-
-
-    public void setColor(String color){
-        if(color.equals("blue")){
-            colorType = SampleColor.BLUE;
-        } else if(color.equals("red")){
-            colorType = SampleColor.RED;
-        } else if(color.equals("yellow")){
-            colorType = SampleColor.YELLOW;
-        }
-    }
-
-
 }
